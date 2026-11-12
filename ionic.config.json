@@ -1,0 +1,7 @@
+{
+  "name": "registro-infantil-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
