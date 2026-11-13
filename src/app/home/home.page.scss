@@ -25,3 +25,95 @@
 #container a {
   text-decoration: none;
 }
+
+/* Contenedor de cada campo */
+.modern-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+/* Etiqueta flotando libremente arriba */
+.modern-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 6px; /* Distancia perfecta entre el texto y la caja */
+}
+
+/* Estilo moderno de la caja para el input y textarea */
+.modern-field ion-input,
+.modern-field ion-textarea {
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Altura para el cuadro de observaciones */
+.modern-field ion-textarea {
+  min-height: 85px;
+}
+
+/* Efecto al hacer clic o escribir en los campos */
+.modern-field ion-input.ion-focused,
+.modern-field ion-textarea.ion-focused {
+  border-color: #3880ff;
+  box-shadow: 0 0 0 3px rgba(56, 128, 255, 0.12);
+}
+
+/* Estilo para las tarjetas de contadores */
+.stat-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+  
+  ion-card-content {
+    padding: 16px 20px;
+  }
+}
+
+/* Número grande azul */
+.stat-number {
+  font-size: 26px;
+  font-weight: 700;
+  color: #3880ff; // Color primario de Ionic (o puedes ponerle #1e293b si prefieres oscuro)
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+/* Etiqueta gris descriptiva */
+.stat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 5px;
+  padding-left: 100px;
+
+  .app-logo {
+    width: 200px;   /* Aumenta este valor si lo quieres aún más grande (ej. 140px o 160px) */
+    height: auto;
+    object-fit: contain;
+  }
+
+  .logo-text {
+    h2 {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #1e293b;
+      margin: 0;
+    }
+  }
+}

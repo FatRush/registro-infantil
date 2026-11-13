@@ -1,21 +1,292 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> Blank </ion-title>
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title>Registro Infantil</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar color="light">
+    <ion-segment [(ngModel)]="segmentoActivo" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="registrar">
+        REGISTRAR NIÑO
+      </ion-segment-button>
+      <ion-segment-button value="lista">
+        VER REGISTRADOS ({{ listaNinos.length }})
+      </ion-segment-button>
+      <ion-segment-button value="servidores">
+        SERVIDORES
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>
-      Start with Ionic
-      <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a>
-    </p>
+  <!-- Contenedor del Logo y Título -->
+  <div class="logo-container ion-margin-bottom">
+    <img src="assets/Adoradores.png" alt="Logo Registro Infantil" class="app-logo">
+    <div class="logo-text">
+    </div>
   </div>
+
+  <!-- Rejilla contenedora para hacer la vista adaptable y centrada en pantallas grandes -->
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="8" size-lg="6">
+
+        <!-- VISTA 1: FORMULARIO DE REGISTRO -->
+        @if (segmentoActivo === 'registrar') {
+          <ion-card class="ion-no-margin ion-margin-bottom">
+            <ion-card-header>
+              <ion-card-title>Nuevo Registro</ion-card-title>
+            </ion-card-header>
+            
+            <ion-card-content>
+              
+              <!-- Nombre (Obligatorio) -->
+              <div class="modern-field">
+                <label for="input-nombre">Nombre Completo del Niño *</label>
+                <ion-input 
+                  id="input-nombre"
+                  placeholder="Escribe el nombre completo"
+                  [value]="nino.nombre" 
+                  (ionInput)="nino.nombre = $any($event).target.value" 
+                  required>
+                </ion-input>
+              </div>
+
+              <!-- Edad (Obligatorio) -->
+              <div class="modern-field">
+                <label for="input-edad">Edad *</label>
+                <ion-input 
+                  id="input-edad"
+                  type="number" 
+                  placeholder="Ej. 7"
+                  [value]="nino.edad" 
+                  (ionInput)="nino.edad = $any($event).target.value" 
+                  required>
+                </ion-input>
+              </div>
+
+              <!-- Papá / Encargado (Obligatorio) -->
+              <div class="modern-field">
+                <label for="input-papa">Nombre del Papá / Encargado *</label>
+                <ion-input 
+                  id="input-papa"
+                  placeholder="Nombre del Responsable"
+                  [value]="nino.papa" 
+                  (ionInput)="nino.papa = $any($event).target.value" 
+                  required>
+                </ion-input>
+              </div>
+
+              <!-- Teléfono (Obligatorio) -->
+              <div class="modern-field">
+                <label for="input-telefono">Teléfono del Papá / Encargado *</label>
+                <ion-input 
+                  id="input-telefono"
+                  type="tel"
+                  placeholder="Ejemplo: 99999999"
+                  [value]="nino.telefono" 
+                  (ionInput)="nino.telefono = $any($event).target.value" 
+                  required>
+                  <ion-icon slot="start" name="phone-portrait-outline" aria-hidden="true"></ion-icon>
+                </ion-input>
+              </div>
+
+              <!-- Observaciones (Opcional) -->
+              <div class="modern-field">
+                <label for="input-observaciones">Observaciones (alergias, etc.)</label>
+                <ion-textarea 
+                  id="input-observaciones"
+                  placeholder="Opcional..."
+                  [value]="nino.observaciones"
+                  (ionInput)="nino.observaciones = $any($event).target.value">
+                </ion-textarea>
+              </div>
+
+              <ion-button expand="block" type="button" (click)="registrarNino()" class="ion-margin-top" color="primary">
+                {{ editandoId ? 'Actualizar Registro' : 'Guardar Registro' }}
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        }
+
+        <!-- VISTA 2: LISTA DE NIÑOS REGISTRADOS -->
+        @if (segmentoActivo === 'lista') {
+          <div>
+            
+            <!-- TARJETAS DE CONTADORES ESTILO MÉTRICAS -->
+            <ion-grid class="ion-no-padding ion-margin-bottom">
+              <ion-row>
+                <ion-col size="12" size-md="4">
+                  <ion-card class="stat-card ion-no-margin ion-margin-bottom">
+                    <ion-card-content>
+                      <div class="stat-number">{{ totalNinos }}</div>
+                      <div class="stat-label">Niños registrados</div>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="12" size-md="4">
+                  <ion-card class="stat-card ion-no-margin ion-margin-bottom">
+                    <ion-card-content>
+                      <div class="stat-number">{{ totalHoy }}</div>
+                      <div class="stat-label">Registrados hoy</div>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="12" size-md="4">
+                  <ion-card class="stat-card ion-no-margin ion-margin-bottom">
+                    <ion-card-content>
+                      <div class="stat-number">{{ totalActivos }}</div>
+                      <div class="stat-label">Activos</div>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+            <!-- BUSCADOR DE NIÑOS -->
+            <ion-searchbar 
+              placeholder="Buscar por nombre o encargado..." 
+              [value]="filtroNinos" 
+              (ionInput)="filtroNinos = $any($event).target.value"
+              animated="true">
+            </ion-searchbar>
+
+            <ion-list lines="none">
+              <ion-list-header>
+                <ion-label><b>Lista en Tiempo Real</b></ion-label>
+              </ion-list-header>
+
+              <!-- USAMOS LA LISTA FILTRADA -->
+              @for (item of listaNinosFiltrada; track item.id) {
+                <ion-card class="ion-margin-bottom">
+                  <ion-card-content>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                      <h2 style="margin: 0;"><b>{{ item.nombre }}</b> ({{ item.edad }} años)</h2>
+                      <ion-badge [color]="item.activo ? 'success' : 'medium'">
+                        {{ item.activo ? 'ACTIVO' : 'INACTIVO' }}
+                      </ion-badge>
+                    </div>
+
+                    <p><b>Encargado:</b> {{ item.papa }}</p>
+                    <p><b>Teléfono:</b> {{ item.telefono }}</p>
+
+                    @if (item.observaciones) {
+                      <p><em>Obs: {{ item.observaciones }}</em></p>
+                    }
+                    
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                      <ion-button [color]="item.activo ? 'warning' : 'success'" size="small" fill="outline" (click)="toggleActivo(item)" class="ion-margin-top">
+                        {{ item.activo ? 'Marcar Inactivo' : 'Marcar Activo' }}
+                      </ion-button>
+
+                      <ion-button color="medium" size="small" fill="outline" (click)="cargarParaEditar(item)" class="ion-margin-top">
+                        Editar
+                      </ion-button>
+
+                      <ion-button color="danger" size="small" fill="outline" (click)="eliminar(item.id)" class="ion-margin-top">
+                        Eliminar
+                      </ion-button>
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              }
+
+              @if (listaNinosFiltrada.length === 0) {
+                <p style="text-align: center; color: #666; margin-top: 40px;">
+                  No hay registros todavía.
+                </p>
+              }
+            </ion-list>
+          </div>
+        }
+
+        <!-- VISTA 3: SERVIDORES -->
+        @if (segmentoActivo === 'servidores') {
+          <div>
+            <!-- Formulario de Registro / Edición de Servidores -->
+            <ion-card class="ion-no-margin ion-margin-bottom">
+              <ion-card-header>
+                <ion-card-title>{{ editandoServidorId ? 'Editar Servidor o Guía' : 'Asignación de Servidores o Guías' }}</ion-card-title>
+              </ion-card-header>
+              
+              <ion-card-content>
+                <div class="modern-field">
+                  <label for="input-servidor">Nombre del Servidor / Persona Guía *</label>
+                  <ion-input 
+                    id="input-servidor"
+                    placeholder="Ej. Juan Pérez"
+                    [value]="servidor.nombre" 
+                    (ionInput)="servidor.nombre = $any($event).target.value" 
+                    required>
+                  </ion-input>
+                </div>
+
+                <div class="modern-field">
+                  <label for="input-grupo">Grupo Asignado *</label>
+                  <ion-input 
+                    id="input-grupo"
+                    placeholder="Ej. Grupo Juvenil / Grupo A"
+                    [value]="servidor.grupo" 
+                    (ionInput)="servidor.grupo = $any($event).target.value" 
+                    required>
+                  </ion-input>
+                </div>
+
+                <ion-button expand="block" type="button" (click)="guardarServidor()" class="ion-margin-top" color="primary">
+                  {{ editandoServidorId ? 'Actualizar Servidor' : 'Guardar Servidor' }}
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+
+            <!-- BUSCADOR DE SERVIDORES -->
+            <ion-searchbar 
+              placeholder="Buscar servidor o grupo..." 
+              [value]="filtroServidores" 
+              (ionInput)="filtroServidores = $any($event).target.value"
+              animated="true">
+            </ion-searchbar>
+
+            <!-- Lista inferior de Servidores en tiempo real -->
+            <ion-list lines="none">
+              <ion-list-header>
+                <ion-label><b>Servidores Registrados ({{ listaServidoresFiltrada.length }})</b></ion-label>
+              </ion-list-header>
+
+              <!-- USAMOS LA LISTA FILTRADA DE SERVIDORES -->
+              @for (item of listaServidoresFiltrada; track item.id) {
+                <ion-card class="ion-margin-bottom">
+                  <ion-card-content>
+                    <h2 style="margin: 0 0 6px 0;"><b>{{ item.nombre }}</b></h2>
+                    <p><b>Grupo:</b> {{ item.grupo }}</p>
+                    
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                      <ion-button color="medium" size="small" fill="outline" (click)="cargarServidorParaEditar(item)" class="ion-margin-top">
+                        Editar
+                      </ion-button>
+
+                      <ion-button color="danger" size="small" fill="outline" (click)="eliminarServidor(item.id)" class="ion-margin-top">
+                        Eliminar
+                      </ion-button>
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              }
+
+              @if (listaServidoresFiltrada.length === 0) {
+                <p style="text-align: center; color: #666; margin-top: 40px;">
+                  No hay servidores registrados todavía.
+                </p>
+              }
+            </ion-list>
+          </div>
+        }
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
 </ion-content>

@@ -1,0 +1,3 @@
+[build]
+  command = "npx ionic build --prod"
+  publish = "www"
